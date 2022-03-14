@@ -163,3 +163,153 @@ SELECT country_id, COUNT(*) FROM city
 GROUP BY country_id 
 ORDER BY COUNT(*) DESC 
 LIMIT 1;
+
+---                                 ÖDEV8
+-- 1) test veritabanınızda employee isimli sütun bilgileri id(INTEGER), name VARCHAR(50), birthday DATE, email VARCHAR(100) olan bir tablo oluşturalım.
+
+CREATE TABLE employee(
+	id INTEGER PRIMARY KEY,
+	name VARCHAR(50) NOT NULL,
+	birthday DATE,
+	email VARCHAR(100)
+);
+
+-- 2) Oluşturduğumuz employee tablosuna 'Mockaroo' servisini kullanarak 50 adet veri ekleyelim.
+
+insert into employee (id, name, birthday, email) values (1, 'Mesut io', '1994-03-18', 'mesutio@gmail.com');
+insert into employee (id, name, birthday, email) values (2, 'Ahmet Demir', '19995-08-25', 'ahmetdmr@gmail.com');
+insert into employee (id, name, birthday, email) values (3, 'Kübra Tunç', '1997-02-15', 'kubratunc@gmail.com');
+insert into employee (id, name, birthday, email) values (4, 'Merve Yılmaz', '1995-12-27', 'mrvtılmaz@gmail.com');
+insert into employee (id, name, birthday, email) values (5, 'Ezel Çelik', '1997-09-01', 'ezlclk0@gmail.com');
+
+
+
+
+-- 3) Sütunların her birine göre diğer sütunları güncelleyecek 5 adet UPDATE işlemi yapalım.
+
+UPDATE employee
+	SET name = 'Mesut İO',
+		birthday = '1996-07-21',
+		email = 'mesutio5@gmail.com'
+	WHERE id=1
+  RETURNING *;
+
+-- 4) Sütunların her birine göre ilgili satırı silecek 5 adet DELETE işlemi yapalım.
+
+DELETE FROM employee
+WHERE id=8;
+
+
+---                                                   ÖDEV9
+-- 1) city tablosu ile country tablosunda bulunan şehir (city) ve ülke (country) isimlerini birlikte görebileceğimiz INNER JOIN sorgusunu yazınız.
+
+SELECT city, country FROM city 
+INNER JOIN country 
+ON city.country_id=country.country_id;
+
+-- 2) customer tablosu ile payment tablosunda bulunan payment_id ile customer tablosundaki first_name ve last_name isimlerini birlikte görebileceğimiz INNER JOIN sorgusunu yazınız.
+
+SELECT payment.payment_id, customer.first_name, customer.last_name FROM customer
+INNER JOIN payment
+ON customer.customer_id = payment.customer_id;
+
+-- 3) customer tablosu ile rental tablosunda bulunan rental_id ile customer tablosundaki first_name ve last_name isimlerini birlikte görebileceğimiz INNER JOIN sorgusunu yazınız.
+
+SELECT rental.rental_id, customer.first_name, customer.last_name
+FROM customer
+INNER JOIN rental
+
+---                                          ÖDEV10
+SELECT city.city, country.country FROM city
+LEFT JOIN country
+ON city.country_id = country.country_id;
+
+-- 2) customer tablosu ile payment tablosunda bulunan payment_id ile customer tablosundaki first_name ve last_name isimlerini birlikte görebileceğimiz RIGHT JOIN sorgusunu yazınız.
+
+SELECT payment.payment_id, customer.first_name, customer.last_name FROM customer
+RIGHT JOIN payment
+ON customer.customer_id = payment.customer_id;
+
+--3) customer tablosu ile rental tablosunda bulunan rental_id ile customer tablosundaki first_name ve last_name isimlerini birlikte görebileceğimiz FULL JOIN sorgusunu yazınız.
+
+SELECT rental.rental_id, customer.first_name, customer.last_name
+FROM customer
+FULL JOIN rental
+ON customer.customer_id=rental.customer_id;
+ON customer.customer_id=rental.customer_id;
+
+---                                ÖDEV11
+
+
+
+-- 1) actor ve customer tablolarında bulunan first_name sütunları için tüm verileri sıralayalım.
+
+SELECT first_name FROM actor
+UNION
+SELECT first_name FROM customer;
+
+-- 2) actor ve customer tablolarında bulunan first_name sütunları için kesişen verileri sıralayalım.
+
+SELECT first_name FROM actor
+INTERSECT
+SELECT first_name FROM customer;
+
+---                                    ÖDEV12
+-- 1) film tablosunda film uzunluğu length sütununda gösterilmektedir. Uzunluğu ortalama film uzunluğundan fazla kaç tane film vardır?
+
+SELECT COUNT(*) FROM film
+WHERE length>
+(
+	SELECT AVG(length) FROM film
+);
+
+-- 2) film tablosunda en yüksek rental_rate değerine sahip kaç tane film vardır?
+
+SELECT COUNT(*) FROM film
+WHERE rental_rate =
+(
+	SELECT MAX(rental_rate) FROM film
+);
+
+-- 3) film tablosunda en düşük rental_rate ve en düşük replacement_cost değerlerine sahip filmleri sıralayınız.
+
+SELECT * FROM film
+WHERE rental_rate = 
+(
+	SELECT MIN(rental_rate) FROM film
+) 
+AND replacement_cost = 
+(
+	SELECT MIN(replacement_cost) FROM film
+);
+
+-- 4) payment tablosunda en fazla sayıda alışveriş yapan müşterileri(customer) sıralayınız.
+
+SELECT customer.first_name, customer.last_name  FROM payment 
+INNER JOIN customer 
+ON payment.customer_id = customer.customer_id
+WHERE payment.amount =
+(
+	SELECT MAX(amount) FROM payment
+);
+
+
+-- 3) actor ve customer tablolarında bulunan first_name sütunları için ilk tabloda bulunan ancak ikinci tabloda bulunmayan verileri sıralayalım.
+
+SELECT first_name FROM actor
+EXCEPT
+SELECT first_name FROM customer;
+
+-- 4) İlk 3 sorguyu tekrar eden veriler için de yapalım.
+
+SELECT first_name FROM actor
+UNION ALL
+SELECT first_name FROM customer;
+
+SELECT first_name FROM actor
+INTERSECT ALL
+SELECT first_name FROM customer;
+
+SELECT first_name FROM actor
+EXCEPT ALL
+SELECT first_name FROM customer;
